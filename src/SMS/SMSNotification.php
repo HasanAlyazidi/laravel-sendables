@@ -26,6 +26,12 @@ class SMSNotification
 
     public function send()
     {
+        $isSmsEnabled = config('sendables.sms.options.enabled', true);
+
+        if (!$isSmsEnabled) {
+            return;
+        }
+
         $this->provider->send();
     }
 

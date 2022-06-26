@@ -11,6 +11,10 @@ return [
      * SMS configuration
      */
     'sms' => [
+        'options' => [
+            'enabled' => true,
+        ],
+
         'providers' => [
             /**
              * Default SMS Provider

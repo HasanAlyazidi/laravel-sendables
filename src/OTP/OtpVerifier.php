@@ -49,8 +49,6 @@ class OtpVerifier
             $this->isConfirmed = $this->getProvider()->confirm($code);
         } catch (\Throwable $th) {
             $this->isConfirmed = false;
-            echo $th->getMessage();
-
         }
     }
 
