@@ -3,7 +3,7 @@
 use HasanAlyazidi\Sendables\Models\Otp;
 use HasanAlyazidi\Sendables\OTP\Providers\TesterOtpProvider;
 use HasanAlyazidi\Sendables\OTP\Providers\FirebaseOtpProvider;
-use HasanAlyazidi\Sendables\SMS\Providers\OurSMSProvider;
+use HasanAlyazidi\Sendables\SMS\Providers\OurSMSV2Provider;
 
 return [
 
@@ -19,7 +19,7 @@ return [
             /**
              * Default SMS Provider
              */
-            'default' => OurSMSProvider::class,
+            'default' => OurSMSV2Provider::class,
 
             /**
              * Our SMS
@@ -32,6 +32,17 @@ return [
                 'sender'   => '',
             ],
 
+            /**
+             * Our SMS Version 2
+             *
+             * URL: https://oursms.com
+             */
+            'oursms-v2' => [
+                'username' => '',
+                'password' => '',
+                'sender'   => '',
+                'apiKey'   => '',
+            ],
         ],
     ],
 
