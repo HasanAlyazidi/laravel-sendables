@@ -190,8 +190,6 @@ class OurSMSV2Provider implements ISMSProvider
                     '&prevDups=' . $this->getPrevDups().
                     '&msgClass=' . $this->getMsgClass();
 
-        \Log::alert("url: $url");
-
         try {
             $client = new GuzzleHttp\Client();
             $request = $client->get($url);
