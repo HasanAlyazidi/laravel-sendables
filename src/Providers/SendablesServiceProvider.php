@@ -3,6 +3,7 @@
 namespace HasanAlyazidi\Sendables\Providers;
 
 use HasanAlyazidi\Sendables\SendablesFacade;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 
 class SendablesServiceProvider extends ServiceProvider
@@ -18,7 +19,7 @@ class SendablesServiceProvider extends ServiceProvider
 
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
 
-        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang', 'sendables');
+        $this->loadTranslationsFrom(__DIR__.'/../../lang', 'sendables');
 
         $this->publishAll();
     }
@@ -58,16 +59,22 @@ class SendablesServiceProvider extends ServiceProvider
 
     private function publishTranslations()
     {
+        $isLangFolderInResources = File::isDirectory(resource_path('lang'));
+
+        $langBasePath = $isLangFolderInResources
+            ? resource_path()
+            : base_path();
+
         $this->publishes([
-            __DIR__.'/../../resources/lang/' => resource_path('lang/vendor/sendables')
+            __DIR__.'/../../lang/' => $langBasePath.'/lang/vendor/sendables'
         ], 'resources-lang-all');
 
         $this->publishes([
-            __DIR__.'/../../resources/lang/ar/' => resource_path('lang/vendor/sendables/ar')
+            __DIR__.'/../../lang/ar/' => $langBasePath.'/lang/vendor/sendables/ar'
         ], 'resources-lang-ar');
 
         $this->publishes([
-            __DIR__.'/../../resources/lang/en/' => resource_path('lang/vendor/sendables/en')
+            __DIR__.'/../../lang/en/' => $langBasePath.'/lang/vendor/sendables/en'
         ], 'resources-lang-en');
     }
 }

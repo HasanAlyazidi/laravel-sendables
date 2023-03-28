@@ -7,11 +7,21 @@
 
 ## Install
 
+1. Add package to your `composer.json`
+
 ```bash
 composer require hasanalyazidi/laravel-sendables
 ```
 
+2. Migrate package tables or publish migrations first then migrate
+
+```bash
+php artisan migrate
+```
+
 ---
+
+## Publish package files
 
 ### Publish config file (Required)
 
