@@ -17,7 +17,7 @@ abstract class SystemOtpProvider extends OtpProvider
         $this->mobile = SendablesHelpers::removeLeadingPlus($mobile);
     }
 
-    abstract public function smsProvider(string $message) : ISMSProvider;
+    abstract public function smsProvider(string $message, string $code) : ISMSProvider;
 
     public function getClientType() : string
     {
@@ -40,7 +40,7 @@ abstract class SystemOtpProvider extends OtpProvider
 
             $message = __('sendables::otp.messages.code', ['code' => $code]);
 
-            $sms = $this->smsProvider($message);
+            $sms = $this->smsProvider($message, $code);
             $sms->send();
 
             DB::commit();

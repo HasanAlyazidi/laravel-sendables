@@ -7,7 +7,7 @@ use HasanAlyazidi\Sendables\SMS\Providers\OurSMSProvider;
 
 class OurSMSOtpProvider extends SystemOtpProvider
 {
-    public function smsProvider(string $message) : ISMSProvider
+    public function smsProvider(string $message, string $code) : ISMSProvider
     {
         return new OurSMSProvider($message, $this->mobile);
     }
