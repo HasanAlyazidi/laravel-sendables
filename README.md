@@ -77,6 +77,9 @@ $otp = new OtpVerifier('966000000000');
 $otp->send();
 ```
 
+- WhatsApp:\
+    Add a message template named `otp_code`, type (`Authentication`) with your app supported languages.
+
 ---
 
 ## Contributing

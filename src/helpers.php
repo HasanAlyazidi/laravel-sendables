@@ -54,4 +54,14 @@ class SendablesHelpers {
     {
         return ltrim($value, '+');
     }
+
+    /**
+     * Get app current locale
+     *
+     * @return string
+     */
+    public static function getCurrentLocale()
+    {
+        return config('app.locale');
+    }
 }

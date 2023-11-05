@@ -20,6 +20,7 @@
     "prefer-stable":true,
     "require": {
         "php": ">=7.1|^8.0",
+        "adrii/whatsapp-api": "^0.7.0",
         "guzzlehttp/guzzle": "^7.3",
         "illuminate/contracts": "^6|^7|^8|^9|^10",
         "illuminate/support": "^6|^7|^8|^9|^10"

@@ -100,5 +100,16 @@ return [
         'firebase' => [
             'apiKey' => '',
         ],
+
+        /**
+         * WhatsApp
+         *
+         * URL: https://business.facebook.com
+         */
+        'whatsapp' => [
+            'phoneNumberId' => '',
+            'accessToken'   => '',
+            'graphVersion'  => '',
+        ],
     ]
 ];
