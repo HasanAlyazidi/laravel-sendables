@@ -203,6 +203,6 @@ class OurSMSV2Provider implements ISMSProvider
 
     private function getConfigValue(string $key): ?string
     {
-        return config("sendables.sms.providers.oursms-v2.$key");
+        return config("sendables.services.oursms-v2.$key");
     }
 }

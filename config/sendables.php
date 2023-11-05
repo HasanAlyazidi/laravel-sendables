@@ -20,29 +20,6 @@ return [
              * Default SMS Provider
              */
             'default' => OurSMSV2Provider::class,
-
-            /**
-             * Our SMS
-             *
-             * URL: https://oursms.com
-             */
-            'oursms' => [
-                'username' => '',
-                'password' => '',
-                'sender'   => '',
-            ],
-
-            /**
-             * Our SMS Version 2
-             *
-             * URL: https://oursms.com
-             */
-            'oursms-v2' => [
-                'username' => '',
-                'password' => '',
-                'sender'   => '',
-                'apiKey'   => '',
-            ],
         ],
     ],
 
@@ -60,13 +37,6 @@ return [
              * Default OTP Provider
              */
             'default' => FirebaseOtpProvider::class,
-
-            /**
-             * Google Firebase Phone Authentication
-             */
-            'firebase' => [
-                'apiKey' => '',
-            ],
 
             /**
              * Tester
@@ -96,4 +66,39 @@ return [
          */
         'testers' => [],
     ],
+
+    /**
+     * Services configuration
+     */
+    'services' => [
+        /**
+         * Our SMS
+         *
+         * URL: https://oursms.com
+         */
+        'oursms' => [
+            'username' => '',
+            'password' => '',
+            'sender'   => '',
+        ],
+
+        /**
+         * Our SMS Version 2
+         *
+         * URL: https://oursms.com
+         */
+        'oursms-v2' => [
+            'username' => '',
+            'password' => '',
+            'sender'   => '',
+            'apiKey'   => '',
+        ],
+
+        /**
+         * Google Firebase Phone Authentication
+         */
+        'firebase' => [
+            'apiKey' => '',
+        ],
+    ]
 ];

@@ -37,7 +37,7 @@ class FirebaseOtpProvider extends OtpProvider
 
     public function isAuthenticated(string $otpUserId, string $otpUserToken) : bool
     {
-        $firebaseApiKey = config('sendables.otp.providers.firebase.apiKey');
+        $firebaseApiKey = config('sendables.services.firebase.apiKey');
 
         $data['json']['idToken'] = $otpUserToken;
 

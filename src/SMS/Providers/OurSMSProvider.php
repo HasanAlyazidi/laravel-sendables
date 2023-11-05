@@ -38,9 +38,9 @@ class OurSMSProvider implements ISMSProvider
 
     private function sendSMS(string $mobileNumbers)
     {
-        $username   = config('sendables.sms.providers.oursms.username');
-        $password   = config('sendables.sms.providers.oursms.password');
-        $senderName = config('sendables.sms.providers.oursms.sender');
+        $username   = config('sendables.services.oursms.username');
+        $password   = config('sendables.services.oursms.password');
+        $senderName = config('sendables.services.oursms.sender');
 
         $to   = $mobileNumbers;
         $text = urlencode($this->message);
