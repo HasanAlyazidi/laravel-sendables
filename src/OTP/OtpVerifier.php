@@ -87,6 +87,27 @@ class OtpVerifier
             return;
         }
 
+        $passwordProvider = config('sendables.otp.providers.password');
+
+        $passwordProviderModel  = $passwordProvider['model'];
+        $passwordProviderColumn = $passwordProvider['column'];
+
+        $mobileAccounts = $passwordProviderModel::where('mobile', $this->mobile)->get();
+
+        $countPasswordUsed = $mobileAccounts->whereNotNull($passwordProviderColumn)->count();
+        $isPasswordUsed = $countPasswordUsed >= 1;
+
+        if ($isPasswordUsed) {
+            $doAllAccountsHavePasswords = $mobileAccounts->count() == $countPasswordUsed;
+
+            if ($doAllAccountsHavePasswords) {
+                $this->selectedProvider = new $passwordProvider['provider']($this->mobile);
+                return;
+            }
+
+            // TODO: Multi providers used
+        }
+
         $customProviders = config('sendables.otp.customProviders');
 
         foreach ($customProviders as $code => $customProvider) {

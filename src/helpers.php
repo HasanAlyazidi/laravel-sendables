@@ -34,6 +34,22 @@ class SendablesHelpers {
     }
 
     /**
+     * Get password model
+     *
+     * @return string
+     */
+    public static function getPasswordModel()
+    {
+        $modelClass = config('sendables.otp.providers.password.model');
+
+        if (is_null($modelClass)) {
+            throw new Exception('Please include password `model` in `otp` inside config/sendables.php');
+        }
+
+        return $modelClass;
+    }
+
+    /**
      * Add plus (+) in the beginning
      *
      * @param string $value

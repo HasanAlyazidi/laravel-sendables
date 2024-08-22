@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\User;
 use HasanAlyazidi\Sendables\Models\Otp;
 use HasanAlyazidi\Sendables\OTP\Providers\TesterOtpProvider;
 use HasanAlyazidi\Sendables\OTP\Providers\FirebaseOtpProvider;
+use HasanAlyazidi\Sendables\OTP\Providers\PasswordProvider;
 use HasanAlyazidi\Sendables\SMS\Providers\OurSMSV2Provider;
 
 return [
@@ -37,6 +39,15 @@ return [
              * Default OTP Provider
              */
             'default' => FirebaseOtpProvider::class,
+
+            /**
+             * Password
+             */
+            'password' => [
+                'model'    => User::class,
+                'column'   => 'password',
+                'provider' => PasswordProvider::class,
+            ],
 
             /**
              * Tester
