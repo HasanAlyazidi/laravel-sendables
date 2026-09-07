@@ -196,7 +196,7 @@ class OurSMSV2Provider implements ISMSProvider
 
             if ($request->getStatusCode() == 200) {
                 $this->rawOutput = $request->getBody()->getContents();
-                $this->output    = GuzzleHttp\Utils::jsonDecode($this->rawOutput, true);
+                $this->output    = json_decode($this->rawOutput, true);
             }
         } catch (Throwable $ex) {}
     }

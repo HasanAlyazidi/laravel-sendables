@@ -47,7 +47,7 @@ class FirebaseOtpProvider extends OtpProvider
 
             if ($request->getStatusCode() == 200) {
                 $response = $request->getBody()->getContents();
-                $info = GuzzleHttp\Utils::jsonDecode($response, true);
+                $info = json_decode($response, true);
 
                 // we may add another security layer by checking if 'lastLoginAt' is within last 5 mins
                 foreach ($info['users'] as $user) {
