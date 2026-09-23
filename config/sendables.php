@@ -4,6 +4,7 @@ use App\Models\User;
 use HasanAlyazidi\Sendables\Models\Otp;
 use HasanAlyazidi\Sendables\OTP\Providers\TesterOtpProvider;
 use HasanAlyazidi\Sendables\OTP\Providers\FirebaseOtpProvider;
+use HasanAlyazidi\Sendables\OTP\Providers\OtpProvider;
 use HasanAlyazidi\Sendables\OTP\Providers\PasswordProvider;
 use HasanAlyazidi\Sendables\SMS\Providers\OurSMSV2Provider;
 
@@ -76,6 +77,23 @@ return [
          * 'mobile number' => 'otp code',
          */
         'testers' => [],
+
+        /**
+         * Limits of the codes the server sends (WhatsApp, SMS)
+         *
+         * A provider takes its own value first, then the default one,
+         * then `OtpProvider::DEFAULT_LIMITS`.
+         *
+         * Example of a provider that waits longer and sends less:
+         * OurSMSV2OtpProvider::class => [
+         *     'resendAfterSeconds' => [120, 300],
+         *     'maxSendsPerHour'    => 5,
+         * ],
+         */
+        'limits' => [
+            'default'   => OtpProvider::DEFAULT_LIMITS,
+            'providers' => [],
+        ],
     ],
 
     /**

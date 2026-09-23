@@ -80,6 +80,43 @@ $otp->send();
 - WhatsApp:\
     Add a message template named `otp_code`, type (`Authentication`) with your app supported languages.
 
+### OTP limits
+
+Codes sent by the server (WhatsApp, SMS) are limited per mobile number. Set them in
+`config/sendables.php` under `otp.limits`; a provider takes its own value first, then the
+default one, then `OtpProvider::DEFAULT_LIMITS`.
+
+| Limit | Default | Meaning |
+| --- | --- | --- |
+| `resendAfterSeconds` | `[60, 120, 300]` | Wait after the 1st, 2nd, 3rd... code of the last hour; the last value repeats. A single number means the same wait every time. |
+| `maxSendsPerHour` | `10` | Codes per hour per mobile number. |
+| `maxWrongAttempts` | `5` | Wrong guesses allowed per code, then a new code is needed. |
+| `verifiedForMinutes` | `60` | How long a verified code proves the number to `isAuthenticated()`. |
+
+```php
+'limits' => [
+    'default' => OtpProvider::DEFAULT_LIMITS,
+
+    'providers' => [
+        OurSMSV2OtpProvider::class => [
+            'resendAfterSeconds' => [120, 300],
+            'maxSendsPerHour'    => 5,
+        ],
+    ],
+],
+```
+
+Tell the client when it may ask for another code, and pass it in your send response:
+
+```php
+$otp->getResendAfter(); // seconds
+```
+
+A refused send returns `false` with the error `too-many-requests`, and too many wrong
+guesses return `too-many-attempts`; both have messages in the package language files.
+Limits apply to providers that send from the server, not to Firebase (the phone sends
+it), testers or password logins.
+
 ---
 
 ## Contributing

@@ -72,6 +72,11 @@ class OtpVerifier
         return $this->getProvider()->getOtpUserToken();
     }
 
+    public function getResendAfter() : int
+    {
+        return $this->getProvider()->getResendAfter();
+    }
+
     public function getError() : string
     {
         $errorCode = $this->getProvider()->getError();
