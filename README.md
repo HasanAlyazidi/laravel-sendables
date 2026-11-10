@@ -90,7 +90,7 @@ default one, then `OtpProvider::DEFAULT_LIMITS`.
 | --- | --- | --- |
 | `resendAfterSeconds` | `[60, 120, 300]` | Wait after the 1st, 2nd, 3rd... code of the last hour; the last value repeats. A single number means the same wait every time. |
 | `maxSendsPerHour` | `10` | Codes per hour per mobile number. |
-| `maxWrongAttempts` | `5` | Wrong guesses allowed per code, then a new code is needed. |
+| `maxWrongAttempts` | `5` | Wrong guesses allowed per code, then a new code is needed. Tester numbers, whose code never changes, get this many per 2 minutes. |
 | `verifiedForMinutes` | `60` | How long a verified code proves the number to `isAuthenticated()`. |
 
 ```php
@@ -109,13 +109,15 @@ default one, then `OtpProvider::DEFAULT_LIMITS`.
 Tell the client when it may ask for another code, and pass it in your send response:
 
 ```php
-$otp->getResendAfter(); // seconds
+$otp->getResendAfter(); // seconds until send() accepts the next code, 0 = now
+$otp->canResend();      // false: hide the countdown and the resend button (testers, passwords)
 ```
 
 A refused send returns `false` with the error `too-many-requests`, and too many wrong
 guesses return `too-many-attempts`; both have messages in the package language files.
-Limits apply to providers that send from the server, not to Firebase (the phone sends
-it), testers or password logins.
+Send limits and `verifiedForMinutes` only concern codes the server sends: Firebase (the
+phone sends it), testers and password logins have nothing to wait for, so their
+`getResendAfter()` is always `0`, and entries for them under `providers` are ignored.
 
 ---
 

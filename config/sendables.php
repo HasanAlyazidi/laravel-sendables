@@ -79,7 +79,8 @@ return [
         'testers' => [],
 
         /**
-         * Limits of the codes the server sends (WhatsApp, SMS)
+         * Limits of the codes the server sends (WhatsApp, SMS); tester
+         * numbers only get `maxWrongAttempts`, counted per 2 minutes
          *
          * A provider takes its own value first, then the default one,
          * then `OtpProvider::DEFAULT_LIMITS`.

@@ -77,6 +77,11 @@ class OtpVerifier
         return $this->getProvider()->getResendAfter();
     }
 
+    public function canResend() : bool
+    {
+        return $this->getProvider()->canResend();
+    }
+
     public function getError() : string
     {
         $errorCode = $this->getProvider()->getError();

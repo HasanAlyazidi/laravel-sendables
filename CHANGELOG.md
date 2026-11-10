@@ -3,6 +3,31 @@
 All notable changes to `laravel-sendables` are documented here.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [3.3.0] - 2026-11-10
+
+### Added
+
+- `canResend()` on `OtpVerifier` and the providers: whether the user can ask for another code at all. `false` for testers (the code is fixed) and passwords; when it is `false`, clients show neither a countdown nor a resend button.
+
+### Fixed
+
+- `getResendAfter()` now always tells the truth: it is exactly the time until `send()` accepts the next code, and `0` means now. `send()` refuses while it is above `0`, so the two can no longer disagree.
+  - Testers, Firebase (the phone sends it) and passwords send nothing from the server, so they report `0`. Testers used to report the 60-second wait, so apps showed a countdown to tester numbers.
+  - With no code sent in the last hour it reports `0`. It reported the first wait (60 seconds) while `send()` would have accepted, e.g. after a send that failed.
+  - When more codes are in the last hour than `maxSendsPerHour` allows (the cap was lowered meanwhile), the wait runs until enough of them leave the hour, not just the oldest one.
+- A `maxSendsPerHour` below 1 counts as 1.
+- Two overlapping sends for one mobile no longer both go out: `SystemOtpProvider::send()` holds a cache lock per mobile; a send while another runs gets the `too-many-requests` error.
+- Confirm picks the newest code even when two share a second.
+
+### Security
+
+- Tester numbers now get `maxWrongAttempts` too. Their code never changes, so wrong guesses are counted per number for a code's lifetime (`Otp::EXPIRE_AFTER`, 2 minutes) instead of per code. They were unlimited, so a fixed tester code could be guessed.
+
+### Notes
+
+- Send limits (`resendAfterSeconds`, `maxSendsPerHour`) and `verifiedForMinutes` only concern codes the server sends; entries for other providers under `limits.providers` are ignored, as before.
+- Codes the server sends need a cache store with locks (file, database, redis, memcached, dynamodb, array).
+
 ## [3.2.0] - 2026-09-23
 
 ### Added

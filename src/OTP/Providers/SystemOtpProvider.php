@@ -5,6 +5,7 @@ namespace HasanAlyazidi\Sendables\OTP\Providers;
 use Carbon\Carbon;
 use HasanAlyazidi\Sendables\SMS\Providers\ISMSProvider;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,7 @@ use SendablesHelpers;
 
 abstract class SystemOtpProvider extends OtpProvider
 {
-    const ATTEMPTS_CACHE_KEY = 'sendables-otp-attempts:';
+    const SEND_LOCK_KEY = 'sendables-otp-send:';
 
     protected $mobile;
 
@@ -34,29 +35,19 @@ abstract class SystemOtpProvider extends OtpProvider
 
     public function send() : bool
     {
-        if ($this->isSendLimited()) {
+        // Two overlapping sends would both pass the limits before either
+        // saves its code, so one send per mobile runs at a time.
+        $lock = Cache::lock(self::SEND_LOCK_KEY.$this->mobile, 30);
+
+        if (!$lock->get()) {
             $this->setError(self::ERROR_TOO_MANY_REQUESTS);
             return false;
         }
 
-        DB::beginTransaction();
-
         try {
-            $code = $this->generateCode();
-
-            $this->saveOtp($code);
-
-            $message = __('sendables::otp.messages.code', ['code' => $code]);
-
-            $sms = $this->smsProvider($message, $code);
-            $sms->send();
-
-            DB::commit();
-
-            return $sms->isSent();
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return false;
+            return $this->sendCode();
+        } finally {
+            $lock->release();
         }
     }
 
@@ -67,6 +58,7 @@ abstract class SystemOtpProvider extends OtpProvider
         $otp = $otpModel::where('mobile', $this->mobile)
                   ->whereNull('verified_at')
                   ->latest('created_at')
+                  ->latest('id')
                   ->first();
 
         if ($otp === null) {
@@ -127,39 +119,66 @@ abstract class SystemOtpProvider extends OtpProvider
                   ->exists();
     }
 
+    /**
+     * send() refuses exactly while this is above 0
+     */
     public function getResendAfter() : int
     {
         $sends = $this->sendsOfLastHour();
         $count = count($sends);
 
         if ($count === 0) {
-            return parent::getResendAfter();
+            return 0;
         }
 
         $nextSendAt = $sends[0]->getTimestamp() + $this->waitAfterSend($count);
+        $maxSends   = $this->maxSendsPerHour();
 
-        if ($count >= (int) $this->limit('maxSendsPerHour')) {
-            $windowFreeAt = $sends[$count - 1]->copy()->addHour()->getTimestamp();
-            $nextSendAt   = max($nextSendAt, $windowFreeAt);
+        // A full hour opens again once enough codes leave it, i.e. when the
+        // `$maxSends`-th newest one turns an hour old.
+        if ($count >= $maxSends) {
+            $nextSendAt = max($nextSendAt, $sends[$maxSends - 1]->copy()->addHour()->getTimestamp());
         }
 
         return max(0, $nextSendAt - Carbon::now()->getTimestamp());
     }
 
-    private function isSendLimited() : bool
+    private function sendCode() : bool
     {
-        $sends = $this->sendsOfLastHour();
-        $count = count($sends);
-
-        if ($count === 0) {
+        if ($this->isSendLimited()) {
+            $this->setError(self::ERROR_TOO_MANY_REQUESTS);
             return false;
         }
 
-        if ($count >= (int) $this->limit('maxSendsPerHour')) {
-            return true;
-        }
+        DB::beginTransaction();
 
-        return $sends[0]->getTimestamp() + $this->waitAfterSend($count) > Carbon::now()->getTimestamp();
+        try {
+            $code = $this->generateCode();
+
+            $this->saveOtp($code);
+
+            $message = __('sendables::otp.messages.code', ['code' => $code]);
+
+            $sms = $this->smsProvider($message, $code);
+            $sms->send();
+
+            DB::commit();
+
+            return $sms->isSent();
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return false;
+        }
+    }
+
+    private function isSendLimited() : bool
+    {
+        return $this->getResendAfter() > 0;
+    }
+
+    private function maxSendsPerHour() : int
+    {
+        return max(1, (int) $this->limit('maxSendsPerHour'));
     }
 
     /**

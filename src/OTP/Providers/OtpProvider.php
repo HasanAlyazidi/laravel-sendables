@@ -10,6 +10,8 @@ abstract class OtpProvider {
     const ERROR_TOO_MANY_ATTEMPTS = 'too-many-attempts';
     const ERROR_TOO_MANY_REQUESTS = 'too-many-requests';
 
+    const ATTEMPTS_CACHE_KEY = 'sendables-otp-attempts:';
+
     /**
      * Used when `sendables.otp.limits` has no value for a provider
      *
@@ -37,13 +39,19 @@ abstract class OtpProvider {
     abstract public function isAuthenticated(string $otpUserId, string $otpUserToken) : bool;
 
     /**
-     * Seconds to wait before another code can be requested
+     * Seconds until another code can be sent, 0 = now
      */
     public function getResendAfter() : int
     {
-        $waits = $this->resendWaits();
+        return 0;
+    }
 
-        return $waits[0];
+    /**
+     * Whether another code can be sent at all; clients hide resending when not
+     */
+    public function canResend() : bool
+    {
+        return true;
     }
 
     public function getError() : string

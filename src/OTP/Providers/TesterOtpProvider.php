@@ -2,6 +2,7 @@
 
 namespace HasanAlyazidi\Sendables\OTP\Providers;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\Facades\Crypt;
 use SendablesHelpers;
 use Throwable;
@@ -34,8 +35,25 @@ class TesterOtpProvider extends OtpProvider
         return true;
     }
 
+    public function canResend() : bool
+    {
+        return false;
+    }
+
+    /**
+     * The code never changes, so wrong guesses are counted per number for a
+     * code's lifetime instead of per code.
+     */
     public function confirm(string $code) : bool
     {
+        $limiter     = app(RateLimiter::class);
+        $attemptsKey = self::ATTEMPTS_CACHE_KEY.'tester:'.$this->mobile;
+
+        if ($limiter->tooManyAttempts($attemptsKey, (int) $this->limit('maxWrongAttempts'))) {
+            $this->setError(self::ERROR_TOO_MANY_ATTEMPTS);
+            return false;
+        }
+
         $isCorrectCode = $code === $this->code;
 
         if ($isCorrectCode) {
@@ -44,8 +62,14 @@ class TesterOtpProvider extends OtpProvider
 
             $this->setOtpAuthenticationParams($encryptedOtpUserId, $encryptedOtpUserToken);
 
+            $limiter->clear($attemptsKey);
+
             return true;
         }
+
+        $otpModel = SendablesHelpers::getOtpModel();
+
+        $limiter->hit($attemptsKey, $otpModel::EXPIRE_AFTER);
 
         $this->setError(self::ERROR_WRONG_CODE);
 

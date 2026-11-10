@@ -30,6 +30,11 @@ class PasswordProvider extends OtpProvider
         return true;
     }
 
+    public function canResend() : bool
+    {
+        return false;
+    }
+
     public function confirm(string $password) : bool
     {
         $userModel = SendablesHelpers::getPasswordModel();
